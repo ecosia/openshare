@@ -7,9 +7,9 @@ import Events from './events';
 import countReduce from '../../lib/countReduce';
 import storeCount from '../../lib/storeCount'; // eslint-disable-line no-unused-vars
 
-function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
+// function isNumeric(n) {
+//   return !isNaN(parseFloat(n)) && isFinite(n);
+// }
 
 class Count {
   constructor(type, url) {
