@@ -1,18 +1,19 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
-
 /**
  * Trigger custom OpenShare namespaced event
  */
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var Events = {
   trigger: function trigger(element, event) {
     var ev = document.createEvent('Event');
-    ev.initEvent('OpenShare.' + event, true, true);
+    ev.initEvent("OpenShare.".concat(event), true, true);
     element.dispatchEvent(ev);
   }
 };
@@ -21,21 +22,21 @@ var analytics = function analytics(type, cb) {
   // eslint-disable-line
   var isGA = type === 'event' || type === 'social';
   var isTagManager = type === 'tagManager';
-
   if (isGA) checkIfAnalyticsLoaded(type, cb);
   if (isTagManager) setTagManager(cb);
 };
 
 function checkIfAnalyticsLoaded(type, cb) {
   if (window.ga) {
-    if (cb) cb();
-    // bind to shared event on each individual node
+    if (cb) cb(); // bind to shared event on each individual node
+
     listen(function (e) {
       var platform = e.target.getAttribute('data-open-share');
       var target = e.target.getAttribute('data-open-share-link') || e.target.getAttribute('data-open-share-url') || e.target.getAttribute('data-open-share-username') || e.target.getAttribute('data-open-share-center') || e.target.getAttribute('data-open-share-search') || e.target.getAttribute('data-open-share-body');
 
       if (type === 'event') {
-        ga('send', 'event', { // eslint-disable-line no-undef
+        ga('send', 'event', {
+          // eslint-disable-line no-undef
           eventCategory: 'OpenShare Click',
           eventAction: platform,
           eventLabel: target,
@@ -44,7 +45,8 @@ function checkIfAnalyticsLoaded(type, cb) {
       }
 
       if (type === 'social') {
-        ga('send', { // eslint-disable-line no-undef
+        ga('send', {
+          // eslint-disable-line no-undef
           hitType: 'social',
           socialNetwork: platform,
           socialAction: 'share',
@@ -62,14 +64,10 @@ function checkIfAnalyticsLoaded(type, cb) {
 function setTagManager(cb) {
   if (window.dataLayer && window.dataLayer[0]['gtm.start']) {
     if (cb) cb();
-
     listen(onShareTagManger);
-
     getCounts(function (e) {
       var count = e.target ? e.target.innerHTML : e.innerHTML;
-
       var platform = e.target ? e.target.getAttribute('data-open-share-count-url') : e.getAttribute('data-open-share-count-url');
-
       window.dataLayer.push({
         event: 'OpenShare Count',
         platform: platform,
@@ -93,16 +91,14 @@ function listen(cb) {
 
 function getCounts(cb) {
   var countNode = document.querySelectorAll('[data-open-share-count]');
-
   [].forEach.call(countNode, function (node) {
-    if (node.textContent) cb(node);else node.addEventListener('OpenShare.counted-' + node.getAttribute('data-open-share-count-url'), cb);
+    if (node.textContent) cb(node);else node.addEventListener("OpenShare.counted-".concat(node.getAttribute('data-open-share-count-url')), cb);
   });
 }
 
 function onShareTagManger(e) {
   var platform = e.target.getAttribute('data-open-share');
   var target = e.target.getAttribute('data-open-share-link') || e.target.getAttribute('data-open-share-url') || e.target.getAttribute('data-open-share-username') || e.target.getAttribute('data-open-share-center') || e.target.getAttribute('data-open-share-search') || e.target.getAttribute('data-open-share-body');
-
   window.dataLayer.push({
     event: 'OpenShare Share',
     platform: platform,
@@ -119,23 +115,19 @@ function initializeNodes(opts) {
 
     if (opts.api) {
       var nodes = opts.container.querySelectorAll(opts.selector);
-      [].forEach.call(nodes, opts.cb);
+      [].forEach.call(nodes, opts.cb); // trigger completed event
 
-      // trigger completed event
-      Events.trigger(document, opts.api + '-loaded');
+      Events.trigger(document, "".concat(opts.api, "-loaded"));
     } else {
       // loop through open share node collection
       var shareNodes = opts.container.querySelectorAll(opts.selector.share);
-      [].forEach.call(shareNodes, opts.cb.share);
+      [].forEach.call(shareNodes, opts.cb.share); // trigger completed event
 
-      // trigger completed event
-      Events.trigger(document, 'share-loaded');
+      Events.trigger(document, 'share-loaded'); // loop through count node collection
 
-      // loop through count node collection
       var countNodes = opts.container.querySelectorAll(opts.selector.count);
-      [].forEach.call(countNodes, opts.cb.count);
+      [].forEach.call(countNodes, opts.cb.count); // trigger completed event
 
-      // trigger completed event
       Events.trigger(document, 'count-loaded');
     }
   };
@@ -161,7 +153,6 @@ function initializeWatcher(watcher, fn) {
       // target will match between all mutations so just use first
       fn(mutations[0].target);
     });
-
     observer.observe(w, {
       childList: true
     });
@@ -176,26 +167,24 @@ function init$1(opts) {
       selector: opts.selector,
       cb: opts.cb
     });
+    initNodes(); // check for mutation observers before using, IE11 only
 
-    initNodes();
-
-    // check for mutation observers before using, IE11 only
     if (window.MutationObserver !== undefined) {
       initializeWatcher(document.querySelectorAll('[data-open-share-watch]'), initNodes);
     }
   };
 }
-
 /**
  * Object of transform functions for each openshare api
  * Transform functions passed into OpenShare instance when instantiated
  * Return object containing URL and key/value args
  */
-var ShareTransforms = {
 
+
+var ShareTransforms = {
   // set Twitter share URL
   twitter: function twitter(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user and ios data attribute defined
     // build iOS URL scheme as single string
@@ -207,18 +196,18 @@ var ShareTransforms = {
       }
 
       if (data.url) {
-        message += ' - ' + data.url;
+        message += " - ".concat(data.url);
       }
 
       if (data.hashtags) {
         var tags = data.hashtags.split(',');
         tags.forEach(function (tag) {
-          message += ' #' + tag;
+          message += " #".concat(tag);
         });
       }
 
       if (data.via) {
-        message += ' via ' + data.via;
+        message += " via ".concat(data.via);
       }
 
       return {
@@ -238,11 +227,9 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Twitter retweet URL
   twitterRetweet: function twitterRetweet(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user and ios data attribute defined
     if (ios && data.ios) {
@@ -266,11 +253,9 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Twitter like URL
   twitterLike: function twitterLike(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user and ios data attribute defined
     if (ios && data.ios) {
@@ -294,11 +279,9 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Twitter follow URL
   twitterFollow: function twitterFollow(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user and ios data attribute defined
     if (ios && data.ios) {
@@ -307,7 +290,6 @@ var ShareTransforms = {
       } : {
         id: data.userId
       };
-
       return {
         url: 'twitter://user?',
         data: iosData
@@ -326,8 +308,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Facebook share URL
   facebook: function facebook(data) {
     return {
@@ -339,8 +319,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Facebook send URL
   facebookSend: function facebookSend(data) {
     return {
@@ -352,61 +330,53 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set YouTube play URL
   youtube: function youtube(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user
     if (ios && data.ios) {
       return {
-        url: 'youtube:' + data.video + '?'
+        url: "youtube:".concat(data.video, "?")
       };
     }
 
     return {
-      url: 'https://www.youtube.com/watch?v=' + data.video + '?',
+      url: "https://www.youtube.com/watch?v=".concat(data.video, "?"),
       popup: {
         width: 1086,
         height: 608
       }
     };
   },
-
-
   // set YouTube subcribe URL
   youtubeSubscribe: function youtubeSubscribe(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user
     if (ios && data.ios) {
       return {
-        url: 'youtube://www.youtube.com/user/' + data.user + '?'
+        url: "youtube://www.youtube.com/user/".concat(data.user, "?")
       };
     }
 
     return {
-      url: 'https://www.youtube.com/user/' + data.user + '?',
+      url: "https://www.youtube.com/user/".concat(data.user, "?"),
       popup: {
         width: 880,
         height: 350
       }
     };
   },
-
-
   // set Instagram follow URL
   instagram: function instagram() {
     return {
       url: 'instagram://camera?'
     };
   },
-
-
   // set Instagram follow URL
   instagramFollow: function instagramFollow(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user
     if (ios && data.ios) {
@@ -417,23 +387,19 @@ var ShareTransforms = {
     }
 
     return {
-      url: 'http://www.instagram.com/' + data.username + '?',
+      url: "http://www.instagram.com/".concat(data.username, "?"),
       popup: {
         width: 980,
         height: 655
       }
     };
   },
-
-
   // set Snapchat follow URL
   snapchat: function snapchat(data) {
     return {
-      url: 'snapchat://add/' + data.username + '?'
+      url: "snapchat://add/".concat(data.username, "?")
     };
   },
-
-
   // set Google share URL
   google: function google(data) {
     return {
@@ -445,18 +411,16 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Google maps URL
   googleMaps: function googleMaps(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     if (data.search) {
       data.q = data.search;
       delete data.search;
-    }
+    } // if iOS user and ios data attribute defined
 
-    // if iOS user and ios data attribute defined
+
     if (ios && data.ios) {
       return {
         url: 'comgooglemaps://?',
@@ -477,8 +441,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Pinterest share URL
   pinterest: function pinterest(data) {
     return {
@@ -490,8 +452,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set LinkedIn share URL
   linkedin: function linkedin(data) {
     return {
@@ -503,8 +463,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Buffer share URL
   buffer: function buffer(data) {
     return {
@@ -516,8 +474,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Tumblr share URL
   tumblr: function tumblr(data) {
     return {
@@ -529,8 +485,6 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Reddit share URL
   reddit: function reddit(data) {
     return {
@@ -542,28 +496,25 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Flickr follow URL
   flickr: function flickr(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // if iOS user
     if (ios && data.ios) {
       return {
-        url: 'flickr://photos/' + data.username + '?'
+        url: "flickr://photos/".concat(data.username, "?")
       };
     }
+
     return {
-      url: 'http://www.flickr.com/photos/' + data.username + '?',
+      url: "http://www.flickr.com/photos/".concat(data.username, "?"),
       popup: {
         width: 600,
         height: 650
       }
     };
   },
-
-
   // set WhatsApp share URL
   whatsapp: function whatsapp(data) {
     return {
@@ -571,30 +522,23 @@ var ShareTransforms = {
       data: data
     };
   },
-
-
   // set sms share URL
   sms: function sms(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     return {
       url: ios ? 'sms:&' : 'sms:?',
       data: data
     };
   },
-
-
   // set Email share URL
   email: function email(data) {
-    var url = 'mailto:';
+    var url = 'mailto:'; // if to address specified then add to URL
 
-    // if to address specified then add to URL
     if (data.to !== null) {
-      url += '' + data.to;
+      url += "".concat(data.to);
     }
 
     url += '?';
-
     return {
       url: url,
       data: {
@@ -603,33 +547,29 @@ var ShareTransforms = {
       }
     };
   },
-
-
   // set Github fork URL
   github: function github(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     // eslint-disable-line no-unused-vars
-    var url = data.repo ? 'https://github.com/' + data.repo : data.url;
+    var url = data.repo ? "https://github.com/".concat(data.repo) : data.url;
 
     if (data.issue) {
-      url += '/issues/new?title=' + data.issue + '&body=' + data.body;
+      url += "/issues/new?title=".concat(data.issue, "&body=").concat(data.body);
     }
 
     return {
-      url: url + '?',
+      url: "".concat(url, "?"),
       popup: {
         width: 1020,
         height: 323
       }
     };
   },
-
-
   // set Dribbble share URL
   dribbble: function dribbble(data) {
-    var ios = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var ios = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     // eslint-disable-line no-unused-vars
-    var url = data.shot ? 'https://dribbble.com/shots/' + data.shot + '?' : data.url + '?';
+    var url = data.shot ? "https://dribbble.com/shots/".concat(data.shot, "?") : "".concat(data.url, "?");
     return {
       url: url,
       popup: {
@@ -639,7 +579,7 @@ var ShareTransforms = {
     };
   },
   codepen: function codepen(data) {
-    var url = data.pen && data.username && data.view ? 'https://codepen.io/' + data.username + '/' + data.view + '/' + data.pen + '?' : data.url + '?';
+    var url = data.pen && data.username && data.view ? "https://codepen.io/".concat(data.username, "/").concat(data.view, "/").concat(data.pen, "?") : "".concat(data.url, "?");
     return {
       url: url,
       popup: {
@@ -654,30 +594,28 @@ var ShareTransforms = {
     };
   }
 };
-
 /**
  * OpenShare generates a single share link
  */
 
-var OpenShare = function () {
+var OpenShare =
+/*#__PURE__*/
+function () {
   function OpenShare(type, transform) {
     _classCallCheck(this, OpenShare);
 
     this.ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     this.type = type;
     this.dynamic = false;
-    this.transform = transform;
+    this.transform = transform; // capitalized type
 
-    // capitalized type
     this.typeCaps = type.charAt(0).toUpperCase() + type.slice(1);
-  }
-
-  // returns function named as type set in constructor
+  } // returns function named as type set in constructor
   // e.g twitter()
 
 
   _createClass(OpenShare, [{
-    key: 'setData',
+    key: "setData",
     value: function setData(data) {
       // if iOS user and ios data attribute defined
       // build iOS URL scheme as single string
@@ -688,40 +626,29 @@ var OpenShare = function () {
 
       this.transformData = this.transform(data);
       this.shareUrl = this.template(this.transformData.url, this.transformData.data);
-    }
-
-    // open share URL defined in individual platform functions
+    } // open share URL defined in individual platform functions
 
   }, {
-    key: 'share',
+    key: "share",
     value: function share() {
       var _this = this;
 
       // if iOS share URL has been set then use timeout hack
       // test for native app and fall back to web
       if (this.mobileShareUrl) {
-        (function () {
-          var start = new Date().valueOf();
+        var start = new Date().valueOf();
+        setTimeout(function () {
+          var end = new Date().valueOf(); // if the user is still here, fall back to web
 
-          setTimeout(function () {
-            var end = new Date().valueOf();
+          if (end - start > 1600) {
+            return;
+          }
 
-            // if the user is still here, fall back to web
-            if (end - start > 1600) {
-              return;
-            }
-
-            window.location = _this.shareUrl;
-          }, 1500);
-
-          window.location = _this.mobileShareUrl;
-
-          // open mailto links in same window
-        })();
+          window.location = _this.shareUrl;
+        }, 1500);
+        window.location = this.mobileShareUrl; // open mailto links in same window
       } else if (this.type === 'email') {
-        window.location = this.shareUrl;
-
-        // open social share URLs in new window
+        window.location = this.shareUrl; // open social share URLs in new window
       } else {
         // if popup object present then set window dimensions / position
         if (this.popup && this.transformData.popup) {
@@ -730,38 +657,33 @@ var OpenShare = function () {
 
         window.open(this.shareUrl);
       }
-    }
-
-    // create share URL with GET params
+    } // create share URL with GET params
     // appending valid properties to query string
 
   }, {
-    key: 'template',
+    key: "template",
     value: function template(url, data) {
       //eslint-disable-line
       var nonURLProps = ['appendTo', 'innerHTML', 'classes'];
-
       var shareUrl = url,
-          i = void 0;
+          i;
 
       for (i in data) {
         // only append valid properties
         if (!data[i] || nonURLProps.indexOf(i) > -1) {
           continue; //eslint-disable-line
-        }
+        } // append URL encoded GET param to share URL
 
-        // append URL encoded GET param to share URL
+
         data[i] = encodeURIComponent(data[i]);
-        shareUrl += i + '=' + data[i] + '&';
+        shareUrl += "".concat(i, "=").concat(data[i], "&");
       }
 
       return shareUrl.substr(0, shareUrl.length - 1);
-    }
-
-    // center popup window supporting dual screens
+    } // center popup window supporting dual screens
 
   }, {
-    key: 'openWindow',
+    key: "openWindow",
     value: function openWindow(url, options) {
       //eslint-disable-line
       var dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left,
@@ -772,9 +694,8 @@ var OpenShare = function () {
           //eslint-disable-line
       left = width / 2 - options.width / 2 + dualScreenLeft,
           top = height / 2 - options.height / 2 + dualScreenTop,
-          newWindow = window.open(url, 'OpenShare', 'width=' + options.width + ', height=' + options.height + ', top=' + top + ', left=' + left);
+          newWindow = window.open(url, 'OpenShare', "width=".concat(options.width, ", height=").concat(options.height, ", top=").concat(top, ", left=").concat(left)); // Puts focus on the newWindow
 
-      // Puts focus on the newWindow
       if (window.focus) {
         newWindow.focus();
       }
@@ -832,19 +753,17 @@ function share(e, os, openShare) {
     setData(openShare, os);
   }
 
-  openShare.share(e);
+  openShare.share(e); // trigger shared event
 
-  // trigger shared event
   Events.trigger(os, 'shared');
-}
-
-// type contains a dash
+} // type contains a dash
 // transform to camelcase for function reference
 // TODO: only supports single dash, should should support multiple
+
+
 var dashToCamel = function dashToCamel(dash, type) {
   var nextChar = type.substr(dash + 1, 1);
   var group = type.substr(dash, 2);
-
   type = type.replace(group, nextChar.toUpperCase());
   return type;
 };
@@ -861,33 +780,29 @@ function initializeShareNode(os) {
   var transform = ShareTransforms[type];
 
   if (!transform) {
-    throw new Error('Open Share: ' + type + ' is an invalid type');
+    throw new Error("Open Share: ".concat(type, " is an invalid type"));
   }
 
-  var openShare = new OpenShare(type, transform);
+  var openShare = new OpenShare(type, transform); // specify if this is a dynamic instance
 
-  // specify if this is a dynamic instance
   if (os.getAttribute('data-open-share-dynamic')) {
     openShare.dynamic = true;
-  }
+  } // specify if this is a popup instance
 
-  // specify if this is a popup instance
+
   if (os.getAttribute('data-open-share-popup')) {
     openShare.popup = true;
-  }
+  } // set all optional attributes on open share instance
 
-  // set all optional attributes on open share instance
-  setData(openShare, os);
 
-  // open share dialog on click
+  setData(openShare, os); // open share dialog on click
+
   os.addEventListener('click', function (e) {
     share(e, os, openShare);
   });
-
   os.addEventListener('OpenShare.trigger', function (e) {
     share(e, os, openShare);
   });
-
   os.setAttribute('data-open-share-node', type);
 }
 
@@ -899,16 +814,15 @@ function round(x, precision) {
   var exponent = precision > 0 ? 'e' : 'e-';
   var exponentNeg = precision > 0 ? 'e-' : 'e';
   precision = Math.abs(precision);
-
   return Number(Math.round(x + exponent + precision) + exponentNeg + precision);
 }
 
 function thousandify(num) {
-  return round(num / 1000, 1) + 'K';
+  return "".concat(round(num / 1000, 1), "K");
 }
 
 function millionify(num) {
-  return round(num / 1000000, 1) + 'M';
+  return "".concat(round(num / 1000000, 1), "M");
 }
 
 function countReduce(el, count, cb) {
@@ -923,7 +837,6 @@ function countReduce(el, count, cb) {
     if (cb && typeof cb === 'function') cb(el);
   }
 }
-
 /*
    Sometimes social platforms get confused and drop share counts.
    In this module we check if the returned count is less than the count in
@@ -933,79 +846,71 @@ function countReduce(el, count, cb) {
    Otherwise, store the returned count.
 */
 
+
 var storeCount = function storeCount(t, count) {
   var isArr = t.type.indexOf(',') > -1;
-  var local = Number(t.storeGet(t.type + '-' + t.shared));
+  var local = Number(t.storeGet("".concat(t.type, "-").concat(t.shared)));
 
   if (local > count && !isArr) {
-    var latestCount = Number(t.storeGet(t.type + '-' + t.shared + '-latestCount'));
-    t.storeSet(t.type + '-' + t.shared + '-latestCount', count);
-
+    var latestCount = Number(t.storeGet("".concat(t.type, "-").concat(t.shared, "-latestCount")));
+    t.storeSet("".concat(t.type, "-").concat(t.shared, "-latestCount"), count);
     count = isNumeric$1(latestCount) && latestCount > 0 ? count += local - latestCount : count += local;
   }
 
-  if (!isArr) t.storeSet(t.type + '-' + t.shared, count);
+  if (!isArr) t.storeSet("".concat(t.type, "-").concat(t.shared), count);
   return count;
 };
 
 function isNumeric$1(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
-
 /**
  * Object of transform functions for each openshare api
  * Transform functions passed into OpenShare instance when instantiated
  * Return object containing URL and key/value args
  */
-var CountTransforms = {
 
+
+var CountTransforms = {
   // facebook count data
   facebook: function facebook(url) {
     return {
       type: 'get',
-      url: 'https://graph.facebook.com/?id=' + url,
+      url: "https://graph.facebook.com/?id=".concat(url),
       transform: function transform(xhr) {
         var fb = JSON.parse(xhr.responseText);
-
         var count = fb.share && fb.share.share_count || 0;
-
         return storeCount(this, count);
       }
     };
   },
-
-
   // pinterest count data
   pinterest: function pinterest(url) {
     return {
       type: 'jsonp',
-      url: 'https://api.pinterest.com/v1/urls/count.json?callback=?&url=' + url,
+      url: "https://api.pinterest.com/v1/urls/count.json?callback=?&url=".concat(url),
       transform: function transform(data) {
         var count = data.count || 0;
         return storeCount(this, count);
       }
     };
   },
-
-
   // linkedin count data
   linkedin: function linkedin(url) {
     return {
       type: 'jsonp',
-      url: 'https://www.linkedin.com/countserv/count/share?url=' + url + '&format=jsonp&callback=?',
+      url: "https://www.linkedin.com/countserv/count/share?url=".concat(url, "&format=jsonp&callback=?"),
       transform: function transform(data) {
         var count = data.count || 0;
         return storeCount(this, count);
       }
     };
   },
-
-
   // reddit count data
   reddit: function reddit(url) {
     return {
       type: 'get',
-      url: 'https://www.reddit.com/api/info.json?url=' + url,
+      url: "https://www.reddit.com/api/info.json?url=".concat(url),
       transform: function transform(xhr) {
         var reddit = JSON.parse(xhr.responseText);
         var posts = reddit.data && reddit.data.children || null;
@@ -1021,8 +926,6 @@ var CountTransforms = {
       }
     };
   },
-
-
   // google count data
   google: function google(url) {
     return {
@@ -1049,71 +952,63 @@ var CountTransforms = {
       }
     };
   },
-
-
   // github star count
   githubStars: function githubStars(repo) {
     repo = repo.indexOf('github.com/') > -1 ? repo.split('github.com/')[1] : repo;
     return {
       type: 'get',
-      url: 'https://api.github.com/repos/' + repo,
+      url: "https://api.github.com/repos/".concat(repo),
       transform: function transform(xhr) {
         var count = JSON.parse(xhr.responseText).stargazers_count || 0;
         return storeCount(this, count);
       }
     };
   },
-
-
   // github forks count
   githubForks: function githubForks(repo) {
     repo = repo.indexOf('github.com/') > -1 ? repo.split('github.com/')[1] : repo;
     return {
       type: 'get',
-      url: 'https://api.github.com/repos/' + repo,
+      url: "https://api.github.com/repos/".concat(repo),
       transform: function transform(xhr) {
         var count = JSON.parse(xhr.responseText).forks_count || 0;
         return storeCount(this, count);
       }
     };
   },
-
-
   // github watchers count
   githubWatchers: function githubWatchers(repo) {
     repo = repo.indexOf('github.com/') > -1 ? repo.split('github.com/')[1] : repo;
     return {
       type: 'get',
-      url: 'https://api.github.com/repos/' + repo,
+      url: "https://api.github.com/repos/".concat(repo),
       transform: function transform(xhr) {
         var count = JSON.parse(xhr.responseText).watchers_count || 0;
         return storeCount(this, count);
       }
     };
   },
-
-
   // dribbble likes count
   dribbble: function dribbble(shot) {
     shot = shot.indexOf('dribbble.com/shots') > -1 ? shot.split('shots/')[1] : shot;
-    var url = 'https://api.dribbble.com/v1/shots/' + shot + '/likes';
+    var url = "https://api.dribbble.com/v1/shots/".concat(shot, "/likes");
     return {
       type: 'get',
       url: url,
       transform: function transform(xhr, Events) {
         var _this2 = this;
 
-        var count = JSON.parse(xhr.responseText).length;
+        var count = JSON.parse(xhr.responseText).length; // at this time dribbble limits a response of 12 likes per page
 
-        // at this time dribbble limits a response of 12 likes per page
         if (count === 12) {
           var page = 2;
           recursiveCount(url, page, count, function (finalCount) {
             if (_this2.appendTo && typeof _this2.appendTo !== 'function') {
               _this2.appendTo.appendChild(_this2.os);
             }
+
             countReduce(_this2.os, finalCount, _this2.cb);
-            Events.trigger(_this2.os, 'counted-' + _this2.url);
+            Events.trigger(_this2.os, "counted-".concat(_this2.url));
             return storeCount(_this2, finalCount);
           });
         } else {
@@ -1125,7 +1020,7 @@ var CountTransforms = {
   twitter: function twitter(url) {
     return {
       type: 'get',
-      url: 'https://api.openshare.social/job?url=' + url + '&key=',
+      url: "https://api.openshare.social/job?url=".concat(url, "&key="),
       transform: function transform(xhr) {
         var count = JSON.parse(xhr.responseText).count || 0;
         return storeCount(this, count);
@@ -1136,13 +1031,12 @@ var CountTransforms = {
 
 function recursiveCount(url, page, count, cb) {
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', url + '?page=' + page);
+  xhr.open('GET', "".concat(url, "?page=").concat(page));
   xhr.addEventListener('load', function () {
     //eslint-disable-line
     var likes = JSON.parse(this.response);
-    count += likes.length;
+    count += likes.length; // dribbble like per page is 12
 
-    // dribbble like per page is 12
     if (likes.length === 12) {
       page++;
       recursiveCount(url, page, count, cb);
@@ -1152,12 +1046,14 @@ function recursiveCount(url, page, count, cb) {
   });
   xhr.send();
 }
-
 /**
  * Generate share count instance from one to many networks
  */
 
-var Count = function () {
+
+var Count =
+/*#__PURE__*/
+function () {
   function Count(type, url) {
     var _this3 = this;
 
@@ -1166,9 +1062,9 @@ var Count = function () {
     // throw error if no url provided
     if (!url) {
       throw new Error('Open Share: no url provided for count');
-    }
+    } // check for Github counts
 
-    // check for Github counts
+
     if (type.indexOf('github') === 0) {
       if (type === 'github-stars') {
         type = 'githubStars';
@@ -1179,50 +1075,44 @@ var Count = function () {
       } else {
         console.error('Invalid Github count type. Try github-stars, github-forks, or github-watchers.');
       }
-    }
+    } // if type is comma separate list create array
 
-    // if type is comma separate list create array
+
     if (type.indexOf(',') > -1) {
       this.type = type;
       this.typeArr = this.type.split(',');
-      this.countData = [];
+      this.countData = []; // check each type supplied is valid
 
-      // check each type supplied is valid
       this.typeArr.forEach(function (t) {
         if (!CountTransforms[t]) {
-          throw new Error('Open Share: ' + type + ' is an invalid count type');
+          throw new Error("Open Share: ".concat(type, " is an invalid count type"));
         }
 
         _this3.countData.push(CountTransforms[t](url));
       });
-
-      var count = this.storeGet(this.type + '-' + this.shared);
+      var count = this.storeGet("".concat(this.type, "-").concat(this.shared));
 
       if (count) {
         if (this.appendTo && typeof this.appendTo !== 'function') {
           this.appendTo.appendChild(this.os);
         }
+
         countReduce(this.os, count);
-      }
+      } // throw error if invalid type provided
 
-      // throw error if invalid type provided
     } else if (!CountTransforms[type]) {
-      throw new Error('Open Share: ' + type + ' is an invalid count type');
-
-      // single count
+      throw new Error("Open Share: ".concat(type, " is an invalid count type")); // single count
       // store count URL and transform function
     } else {
       this.type = type;
       this.countData = CountTransforms[type](url);
     }
-  }
-
-  // handle calling getCount / getCounts
+  } // handle calling getCount / getCounts
   // depending on number of types
 
 
   _createClass(Count, [{
-    key: 'count',
+    key: "count",
     value: function count(os, cb, appendTo) {
       this.os = os;
       this.appendTo = appendTo;
@@ -1236,48 +1126,46 @@ var Count = function () {
       } else {
         this.getCounts();
       }
-    }
-
-    // fetch count either AJAX or JSONP
+    } // fetch count either AJAX or JSONP
 
   }, {
-    key: 'getCount',
+    key: "getCount",
     value: function getCount() {
-      var count = this.storeGet(this.type + '-' + this.shared);
+      var count = this.storeGet("".concat(this.type, "-").concat(this.shared));
 
       if (count) {
         if (this.appendTo && typeof this.appendTo !== 'function') {
           this.appendTo.appendChild(this.os);
         }
+
         countReduce(this.os, count);
       }
-      this[this.countData.type](this.countData);
-    }
 
-    // fetch multiple counts and aggregate
+      this[this.countData.type](this.countData);
+    } // fetch multiple counts and aggregate
 
   }, {
-    key: 'getCounts',
+    key: "getCounts",
     value: function getCounts() {
       var _this4 = this;
 
       this.total = [];
-
-      var count = this.storeGet(this.type + '-' + this.shared);
+      var count = this.storeGet("".concat(this.type, "-").concat(this.shared));
 
       if (count) {
         if (this.appendTo && typeof this.appendTo !== 'function') {
           this.appendTo.appendChild(this.os);
         }
+
         countReduce(this.os, count);
       }
 
       this.countData.forEach(function (countData) {
         _this4[countData.type](countData, function (num) {
-          _this4.total.push(num);
-
-          // total counts length now equals type array length
+          _this4.total.push(num); // total counts length now equals type array length
           // so aggregate, store and insert into DOM
+
+
           if (_this4.total.length === _this4.typeArr.length) {
             var tot = 0;
 
@@ -1289,7 +1177,8 @@ var Count = function () {
               _this4.appendTo.appendChild(_this4.os);
             }
 
-            var local = Number(_this4.storeGet(_this4.type + '-' + _this4.shared));
+            var local = Number(_this4.storeGet("".concat(_this4.type, "-").concat(_this4.shared)));
+
             if (local > tot) {
               // const latestCount = Number(this.storeGet(`${this.type}-${this.shared}-latestCount`));
               // this.storeSet(`${this.type}-${this.shared}-latestCount`, tot);
@@ -1299,7 +1188,8 @@ var Count = function () {
               // tot += local;
               tot = local;
             }
-            _this4.storeSet(_this4.type + '-' + _this4.shared, tot);
+
+            _this4.storeSet("".concat(_this4.type, "-").concat(_this4.shared), tot);
 
             countReduce(_this4.os, tot);
           }
@@ -1309,17 +1199,16 @@ var Count = function () {
       if (this.appendTo && typeof this.appendTo !== 'function') {
         this.appendTo.appendChild(this.os);
       }
-    }
-
-    // handle JSONP requests
+    } // handle JSONP requests
 
   }, {
-    key: 'jsonp',
+    key: "jsonp",
     value: function jsonp(countData, cb) {
       var _this5 = this;
 
       // define random callback and assign transform function
       var callback = Math.random().toString(36).substring(7).replace(/[^a-zA-Z]/g, '');
+
       window[callback] = function (data) {
         var count = countData.transform.apply(_this5, [data]) || 0;
 
@@ -1329,30 +1218,27 @@ var Count = function () {
           if (_this5.appendTo && typeof _this5.appendTo !== 'function') {
             _this5.appendTo.appendChild(_this5.os);
           }
+
           countReduce(_this5.os, count, _this5.cb);
         }
 
-        Events.trigger(_this5.os, 'counted-' + _this5.url);
-      };
+        Events.trigger(_this5.os, "counted-".concat(_this5.url));
+      }; // append JSONP script tag to page
 
-      // append JSONP script tag to page
+
       var script = document.createElement('script');
-      script.src = countData.url.replace('callback=?', 'callback=' + callback);
+      script.src = countData.url.replace('callback=?', "callback=".concat(callback));
       document.getElementsByTagName('head')[0].appendChild(script);
-
       return;
-    }
-
-    // handle AJAX GET request
+    } // handle AJAX GET request
 
   }, {
-    key: 'get',
+    key: "get",
     value: function get(countData, cb) {
       var _this6 = this;
 
-      var xhr = new XMLHttpRequest();
+      var xhr = new XMLHttpRequest(); // on success pass response to transform function
 
-      // on success pass response to transform function
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
@@ -1364,10 +1250,11 @@ var Count = function () {
               if (_this6.appendTo && typeof _this6.appendTo !== 'function') {
                 _this6.appendTo.appendChild(_this6.os);
               }
+
               countReduce(_this6.os, count, _this6.cb);
             }
 
-            Events.trigger(_this6.os, 'counted-' + _this6.url);
+            Events.trigger(_this6.os, "counted-".concat(_this6.url));
             return;
           } else if (countData.url.toLowerCase().indexOf('https://api.openshare.social/job?') === 0) {
             console.warn('Please sign up for Twitter counts at https://openshare.social/twitter/auth');
@@ -1379,10 +1266,11 @@ var Count = function () {
               if (_this6.appendTo && typeof _this6.appendTo !== 'function') {
                 _this6.appendTo.appendChild(_this6.os);
               }
+
               countReduce(_this6.os, _count, _this6.cb);
             }
 
-            Events.trigger(_this6.os, 'counted-' + _this6.url);
+            Events.trigger(_this6.os, "counted-".concat(_this6.url));
           } else {
             console.warn('Failed to get API data from', countData.url, '. Please use the latest version of OpenShare.');
             var _count2 = 0;
@@ -1393,30 +1281,27 @@ var Count = function () {
               if (_this6.appendTo && typeof _this6.appendTo !== 'function') {
                 _this6.appendTo.appendChild(_this6.os);
               }
+
               countReduce(_this6.os, _count2, _this6.cb);
             }
 
-            Events.trigger(_this6.os, 'counted-' + _this6.url);
+            Events.trigger(_this6.os, "counted-".concat(_this6.url));
           }
         }
       };
 
       countData.url = countData.url.startsWith('https://api.openshare.social/job?') && this.key ? countData.url + this.key : countData.url;
-
       xhr.open('GET', countData.url);
       xhr.send();
-    }
-
-    // handle AJAX POST request
+    } // handle AJAX POST request
 
   }, {
-    key: 'post',
+    key: "post",
     value: function post(countData, cb) {
       var _this7 = this;
 
-      var xhr = new XMLHttpRequest();
+      var xhr = new XMLHttpRequest(); // on success pass response to transform function
 
-      // on success pass response to transform function
       xhr.onreadystatechange = function () {
         if (xhr.readyState !== XMLHttpRequest.DONE || xhr.status !== 200) {
           return;
@@ -1430,9 +1315,11 @@ var Count = function () {
           if (_this7.appendTo && typeof _this7.appendTo !== 'function') {
             _this7.appendTo.appendChild(_this7.os);
           }
+
           countReduce(_this7.os, count, _this7.cb);
         }
-        Events.trigger(_this7.os, 'counted-' + _this7.url);
+
+        Events.trigger(_this7.os, "counted-".concat(_this7.url));
       };
 
       xhr.open('POST', countData.url);
@@ -1440,25 +1327,26 @@ var Count = function () {
       xhr.send(JSON.stringify(countData.data));
     }
   }, {
-    key: 'storeSet',
+    key: "storeSet",
     value: function storeSet(type) {
-      var count = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+      var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
       //eslint-disable-line
       if (!window.localStorage || !type) {
         return;
       }
 
-      localStorage.setItem('OpenShare-' + type, count);
+      localStorage.setItem("OpenShare-".concat(type), count);
     }
   }, {
-    key: 'storeGet',
+    key: "storeGet",
     value: function storeGet(type) {
       //eslint-disable-line
       if (!window.localStorage || !type) {
         return;
       }
 
-      return localStorage.getItem('OpenShare-' + type);
+      return localStorage.getItem("OpenShare-".concat(type));
     }
   }]);
 
@@ -1470,7 +1358,6 @@ function initializeCountNode(os) {
   var type = os.getAttribute('data-open-share-count');
   var url = os.getAttribute('data-open-share-count-repo') || os.getAttribute('data-open-share-count-shot') || os.getAttribute('data-open-share-count-url');
   var count = new Count(type, url);
-
   count.count(os);
   os.setAttribute('data-open-share-node', type);
 }
@@ -1487,53 +1374,59 @@ function init() {
     }
   })();
 }
+
 var DataAttr = function DataAttr() {
   if (document.readyState === 'complete') {
     return init();
   }
+
   document.addEventListener('readystatechange', function () {
     if (document.readyState === 'complete') {
       init();
     }
   }, false);
 };
-
 /**
  * Global OpenShare API to generate instances programmatically
  */
+
+
 var ShareAPI = function ShareAPI() {
   // global OpenShare referencing internal class for instance generation
-  var OpenShare$$1 = function () {
+  var OpenShare$$1 =
+  /*#__PURE__*/
+  function () {
     function OpenShare$$1(data, element) {
       var _this8 = this;
 
       _classCallCheck(this, OpenShare$$1);
 
       if (!data.bindClick) data.bindClick = true;
-
       var dash = data.type.indexOf('-');
 
       if (dash > -1) {
         data.type = dashToCamel(dash, data.type);
       }
 
-      var node = void 0;
+      var node;
       this.element = element;
       this.data = data;
-
       this.os = new OpenShare(data.type, ShareTransforms[data.type]);
       this.os.setData(data);
 
       if (!element || data.element) {
         element = data.element;
         node = document.createElement(element || 'a');
+
         if (data.type) {
           node.classList.add('open-share-link', data.type);
           node.setAttribute('data-open-share', data.type);
           node.setAttribute('data-open-share-node', data.type);
         }
+
         if (data.innerHTML) node.innerHTML = data.innerHTML;
       }
+
       if (node) element = node;
 
       if (data.bindClick) {
@@ -1554,30 +1447,23 @@ var ShareAPI = function ShareAPI() {
 
       if (data.type.toLowerCase() === 'paypal') {
         var action = data.sandbox ? 'https://www.sandbox.paypal.com/cgi-bin/webscr' : 'https://www.paypal.com/cgi-bin/webscr';
-
         var buyGIF = data.sandbox ? 'https://www.sandbox.paypal.com/en_US/i/btn/btn_buynow_LG.gif' : 'https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif';
-
         var pixelGIF = data.sandbox ? 'https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif' : 'https://www.paypalobjects.com/en_US/i/scr/pixel.gif';
-
-        var paypalButton = '<form action=' + action + ' method="post" target="_blank">\n\n        <!-- Saved buttons use the "secure click" command -->\n        <input type="hidden" name="cmd" value="_s-xclick">\n\n        <!-- Saved buttons are identified by their button IDs -->\n        <input type="hidden" name="hosted_button_id" value="' + data.buttonId + '">\n\n        <!-- Saved buttons display an appropriate button image. -->\n        <input type="image" name="submit"\n        src=' + buyGIF + '\n        alt="PayPal - The safer, easier way to pay online">\n        <img alt="" width="1" height="1"\n        src=' + pixelGIF + ' >\n\n        </form>';
-
+        var paypalButton = "<form action=".concat(action, " method=\"post\" target=\"_blank\">\n\n        <!-- Saved buttons use the \"secure click\" command -->\n        <input type=\"hidden\" name=\"cmd\" value=\"_s-xclick\">\n\n        <!-- Saved buttons are identified by their button IDs -->\n        <input type=\"hidden\" name=\"hosted_button_id\" value=\"").concat(data.buttonId, "\">\n\n        <!-- Saved buttons display an appropriate button image. -->\n        <input type=\"image\" name=\"submit\"\n        src=").concat(buyGIF, "\n        alt=\"PayPal - The safer, easier way to pay online\">\n        <img alt=\"\" width=\"1\" height=\"1\"\n        src=").concat(pixelGIF, " >\n\n        </form>");
         var hiddenDiv = document.createElement('div');
         hiddenDiv.style.display = 'none';
         hiddenDiv.innerHTML = paypalButton;
         document.body.appendChild(hiddenDiv);
-
         this.paypal = hiddenDiv.querySelector('form');
       }
 
       this.element = element;
       return element;
-    }
-
-    // public share method to trigger share programmatically
+    } // public share method to trigger share programmatically
 
 
     _createClass(OpenShare$$1, [{
-      key: 'share',
+      key: "share",
       value: function share(e) {
         // if dynamic instance then fetch attributes again in case of updates
         if (this.data.dynamic) {
@@ -1598,32 +1484,30 @@ var ShareAPI = function ShareAPI() {
 
   return OpenShare$$1;
 };
-
 /**
  * count API
  */
+
 
 var CountAPI = function CountAPI() {
   //eslint-disable-line
   // global OpenShare referencing internal class for instance generation
   var Count$$1 = function Count$$1(_ref, cb) {
-    var type = _ref.type;
-    var url = _ref.url;
-    var _ref$appendTo = _ref.appendTo;
-    var appendTo = _ref$appendTo === undefined ? false : _ref$appendTo;
-    var element = _ref.element;
-    var classes = _ref.classes;
-    var _ref$key = _ref.key;
-    var key = _ref$key === undefined ? null : _ref$key;
+    var type = _ref.type,
+        url = _ref.url,
+        _ref$appendTo = _ref.appendTo,
+        appendTo = _ref$appendTo === void 0 ? false : _ref$appendTo,
+        element = _ref.element,
+        classes = _ref.classes,
+        _ref$key = _ref.key,
+        key = _ref$key === void 0 ? null : _ref$key;
 
     _classCallCheck(this, Count$$1);
 
     var countNode = document.createElement(element || 'span');
-
     countNode.setAttribute('data-open-share-count', type);
     countNode.setAttribute('data-open-share-count-url', url);
     if (key) countNode.setAttribute('data-open-share-key', key);
-
     countNode.classList.add('open-share-count');
 
     if (classes && Array.isArray(classes)) {
@@ -1650,8 +1534,8 @@ var browser = function browser() {
     analytics: analytics
   };
 };
-var browser_js = browser();
 
+var browser_js = browser();
 module.exports = browser_js;
 
 },{}]},{},[1]);
